@@ -440,8 +440,8 @@ function submit() {
       msg.classList.add("show", d.error ? "error" : "success");
     }
   })
-  .catch(() => {
-    msg.innerText = "Server error";
+  .catch((err) => {
+    msg.innerText = "Network Error: " + err.message + ". Make sure you are using http://localhost:3000";
     msg.classList.add("show", "error");
   })
   .finally(() => {
