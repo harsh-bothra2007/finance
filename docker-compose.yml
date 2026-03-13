@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  finance-app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - finance-data:/usr/src/app/database
+    environment:
+      - PORT=3000
+      - JWT_SECRET=your-secure-secret-here
+    restart: always
+
+volumes:
+  finance-data:

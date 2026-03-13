@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance App - EMI & Subscriptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --sidebar-bg: rgba(255, 255, 255, 0.8);
+  --card: rgba(255, 255, 255, 0.7);
+  --border: rgba(255, 255, 255, 0.6);
+  --border-subtle: rgba(148, 163, 184, 0.2);
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.3);
+  --primary-text: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --radius: 24px;
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.9);
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(135deg, #020617, #0f172a);
+  --sidebar-bg: rgba(15, 23, 42, 0.7);
+  --card: rgba(30, 41, 59, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-glow: rgba(99, 102, 241, 0.3);
+  --primary-text: #ffffff;
+  --success: #22c55e;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --input-bg: rgba(15, 23, 42, 0.8);
+}
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  transition: background 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.layout { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo i { font-size: 28px; color: var(--primary); -webkit-text-fill-color: initial; }
+
+.sidebar nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+.sidebar nav a {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 16px;
+  color: var(--muted); text-decoration: none;
+  font-weight: 500; font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.sidebar nav a i { font-size: 20px; transition: transform 0.3s ease; }
+.sidebar nav a:hover {
+  background: rgba(99, 102, 241, 0.08); color: var(--text); transform: translateX(4px);
+}
+.sidebar nav a.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  color: var(--primary); border-color: rgba(99,102,241,0.2); font-weight: 600;
+}
+.sidebar nav a.active i { color: var(--primary); }
+
+.bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+
+.btn-sidebar {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px; border-radius: 16px; font-weight: 600; font-size: 15px;
+  cursor: pointer; transition: all 0.3s ease;
+  border: 1px solid var(--border-subtle); background: transparent; color: var(--text);
+}
+.btn-sidebar:hover { background: var(--border-subtle); transform: translateY(-2px); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  padding: 40px 60px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container { max-width: 1000px; margin: auto; }
+
+h2, h3 { font-weight: 600; margin: 0 0 20px 0; letter-spacing: -0.5px; }
+h2 { font-size: 24px; }
+h3 { font-size: 18px; color: var(--muted); }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 32px;
+  margin-bottom: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s ease;
+}
+
+.card:hover { box-shadow: var(--shadow-lg); }
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.hero h1 { margin: 0 0 10px 0; font-size: 36px; font-weight: 700; letter-spacing: -1px; }
+.hero .muted { font-size: 18px; margin: 0; }
+
+/* ===== BUTTONS & INPUTS ===== */
+button {
+  padding: 12px 20px; border-radius: 14px; font-weight: 600; font-family: inherit;
+  font-size: 15px; border: none; cursor: pointer; transition: all 0.3s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+button:active { transform: translateY(1px) !important; }
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white; box-shadow: 0 4px 12px var(--primary-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px var(--primary-glow); }
+
+.btn-danger-icon {
+  background: rgba(239, 68, 68, 0.1); color: var(--danger);
+  padding: 8px 12px; border-radius: 10px; font-size: 16px;
+}
+.btn-danger-icon:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.05); }
+
+input, select {
+  background: var(--input-bg); border: 1px solid var(--border-subtle);
+  color: var(--text); padding: 12px 16px; border-radius: 14px;
+  outline: none; font-family: inherit; font-size: 15px; transition: all 0.3s ease;
+  width: 100%; box-sizing: border-box;
+}
+input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+.input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.form-row {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ===== TOTAL BOX ===== */
+.total-box {
+  background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(168,85,247,0.05));
+  border: 1px solid rgba(168,85,247,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 40px;
+}
+
+.total-box h3 { margin: 0; font-size: 20px; color: var(--text); }
+.total-box .amount { font-size: 36px; font-weight: 700; color: var(--primary); }
+
+/* ===== ITEM LIST ===== */
+.item-list { display: flex; flex-direction: column; gap: 16px; }
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.02);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s;
+}
+
+body.dark .item-row { background: rgba(255,255,255,0.02); }
+.item-row:hover { background: rgba(0,0,0,0.04); transform: translateX(6px); box-shadow: var(--shadow-sm); }
+body.dark .item-row:hover { background: rgba(255,255,255,0.04); }
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.item-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.emi-icon { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.sub-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+.item-details h4 { margin: 0 0 6px 0; font-size: 18px; font-weight: 600; color: var(--text); }
+.item-details .meta { font-size: 14px; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+
+.badge {
+  padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+}
+.badge-emi { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+.badge-sub { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); display: flex; align-items: center; gap: 4px;}
+
+.item-right {
+  display: flex; align-items: center; gap: 20px; text-align: right;
+}
+.item-amount { font-size: 20px; font-weight: 700; color: var(--text); }
+
+/* Ambient Glow Backgrounds */
+.ambient-glow-1, .ambient-glow-2 {
+  position: fixed; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.3; pointer-events: none;
+}
+.ambient-glow-1 {
+  width: 500px; height: 500px; background: rgba(239, 68, 68, 0.15); top: -150px; left: 300px;
+}
+.ambient-glow-2 {
+  width: 600px; height: 600px; background: rgba(245, 158, 11, 0.15); bottom: -200px; right: -100px;
+}
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 30px; right: 30px; background: var(--text); color: var(--bg-gradient);
+  padding: 16px 24px; border-radius: 16px; font-weight: 500; opacity: 0; transition: all 0.3s ease;
+  pointer-events: none; z-index: 2000; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; transform: translateY(20px);
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+body.dark #toast { background: var(--text); color: #0f172a; }
+
+@media (max-width: 900px) {
+  .input-group { grid-template-columns: 1fr; }
+  .item-row { grid-template-columns: 1fr; gap: 16px; align-items: stretch; }
+  .item-right { justify-content: space-between; }
+}
+</style>
+</head>
+
+<body>
+<div class="ambient-glow-1"></div>
+<div class="ambient-glow-2"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <i class="ri-wallet-3-fill"></i> Finance
+      </div>
+      <nav>
+        <a href="home.html"><i class="ri-home-5-line"></i> Home</a>
+        <a href="dashboard.html"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+        <a href="analytics.html"><i class="ri-pie-chart-2-line"></i> Analytics</a>
+        <a href="stock.html"><i class="ri-stock-line"></i> Investments</a>
+        <a href="splitwise.html"><i class="ri-group-line"></i> Split Expenses</a>
+        <a href="emi.html" class="active"><i class="ri-bank-card-line"></i> EMI & Subs</a>
+      </nav>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-sidebar" id="themeBtn">
+        <i class="ri-moon-line"></i> <span>Dark Mode</span>
+      </button>
+      <button class="btn-sidebar btn-danger" onclick="logout()">
+        <i class="ri-logout-box-r-line"></i> <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="container">
+
+      <div class="hero card">
+        <div>
+          <h1>EMI & Subscriptions</h1>
+          <p class="muted">Manage your recurring payments and never miss a due date.</p>
+        </div>
+        <i class="ri-calendar-event-line" style="font-size: 64px; color: var(--danger); opacity: 0.8;"></i>
+      </div>
+
+      <div class="card total-box">
+        <h3>Total Monthly Obligation</h3>
+        <div class="amount" id="totalMonthly">₹0</div>
+      </div>
+
+      <div class="input-group">
+        <!-- ADD NEW ITEM -->
+        <div class="card" style="margin-bottom: 0;">
+          <h2><i class="ri-add-circle-fill" style="color:var(--primary)"></i> Add Payment</h2>
+          
+          <div class="form-row">
+            <div>
+              <label class="muted" style="font-size: 13px; margin-bottom: 6px; display: block;">Type</label>
+              <select id="type">
+                <option value="emi">EMI / Loan Installment</option>
+                <option value="subscription">Digital Subscription</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="muted" style="font-size: 13px; margin-bottom: 6px; display: block;">Service / Loan Name</label>
+              <input id="name" placeholder="Netflix, Car Loan, etc.">
+            </div>
+            
+            <div>
+              <label class="muted" style="font-size: 13px; margin-bottom: 6px; display: block;">Monthly Amount (₹)</label>
+              <input id="amount" type="number" placeholder="0.00" min="0">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="muted" style="font-size: 13px; margin-bottom: 6px; display: block;">Remaining Months</label>
+                <input id="months" type="number" placeholder="Leave blank if ∞" min="1">
+              </div>
+              <div>
+                <label class="muted" style="font-size: 13px; margin-bottom: 6px; display: block;">Due Date</label>
+                <input id="dueDay" type="number" min="1" max="31" placeholder="Day (1-31)">
+              </div>
+            </div>
+
+            <button class="btn-primary" onclick="addItem()" style="margin-top: 8px; height: 48px;">
+              <i class="ri-save-3-line"></i> Save Commitment
+            </button>
+          </div>
+        </div>
+
+        <!-- LIST -->
+        <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+          <h3>Active Commitments</h3>
+          <div id="list" class="item-list" style="flex:1;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast"><i class="ri-checkbox-circle-fill" style="color:var(--success); font-size:20px;"></i> <span id="toastMsg">Success</span></div>
+
+<script>
+const API = "";
+const TOKEN = localStorage.getItem("token");
+
+/* Theme & Common Logic */
+function updateThemeIcon() {
+  const btnIcon = document.querySelector("#themeBtn i");
+  const btnText = document.querySelector("#themeBtn span");
+  if (!btnIcon || !btnText) return;
+  if (document.body.classList.contains("dark")) {
+    btnIcon.className = "ri-sun-line";
+    btnText.innerText = "Light Mode";
+  } else {
+    btnIcon.className = "ri-moon-line";
+    btnText.innerText = "Dark Mode";
+  }
+}
+
+if(!localStorage.getItem("theme")) {
+  localStorage.setItem("theme", "dark");
+}
+
+if(localStorage.getItem("theme")==="dark") {
+  document.body.classList.add("dark");
+} else {
+  document.body.classList.remove("dark");
+}
+
+updateThemeIcon();
+
+const tBtn = document.getElementById("themeBtn");
+if(tBtn) {
+  tBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    updateThemeIcon();
+  });
+}
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  document.getElementById("toastMsg").innerText = message;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"), 3000);
+}
+
+// Simple Number Animation
+function animateValue(obj, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(easeOut * (end - start) + start);
+    obj.innerHTML = `₹${current.toLocaleString('en-IN')}`;
+    if (progress < 1) window.requestAnimationFrame(step);
+    else obj.innerHTML = `₹${end.toLocaleString('en-IN')}`;
+  };
+  window.requestAnimationFrame(step);
+}
+
+/* EMI & Subscription Logic */
+let items = [];
+
+async function loadItems() {
+  try {
+    const res = await fetch(API + "/recurring", {
+      headers: { Authorization: "Bearer " + TOKEN }
+    });
+    items = await res.json();
+    
+    // Migration logic
+    const local = JSON.parse(localStorage.getItem("recurring") || "[]");
+    if (items.length === 0 && local.length > 0) {
+      console.log("Migrating local recurring payments to cloud...");
+      for (const item of local) {
+        await fetch(API + "/recurring", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+          body: JSON.stringify({
+            description: item.name,
+            amount: item.amount,
+            type: item.type,
+            nextDate: `2026-03-${item.dueDay.toString().padStart(2, '0')}` // Simple mapping
+          })
+        });
+      }
+      localStorage.removeItem("recurring");
+      return loadItems();
+    }
+  } catch (e) {
+    console.error("Load items error", e);
+  }
+}
+
+async function addItem(){
+  const t = document.getElementById('type').value;
+  const n = document.getElementById('name').value;
+  const a = parseFloat(document.getElementById('amount').value);
+  const m = document.getElementById('months').value ? parseInt(document.getElementById('months').value) : null;
+  const d = parseInt(document.getElementById('dueDay').value);
+
+  if(!n || isNaN(a) || a <= 0 || isNaN(d) || d < 1 || d > 31){
+    alert("Please fill all required fields with valid values.");
+    return;
+  }
+
+  try {
+    await fetch(API + "/recurring", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+      body: JSON.stringify({
+        description: n,
+        amount: a,
+        type: t,
+        nextDate: `2026-03-${d.toString().padStart(2, '0')}`
+      })
+    });
+
+    // Clear inputs
+    document.getElementById('name').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('months').value = '';
+    document.getElementById('dueDay').value = '';
+    
+    await loadItems();
+    render();
+    showToast("Commitment Added ✅");
+  } catch (e) {
+    alert("Failed to save");
+  }
+}
+
+async function deleteItem(id){
+  if(confirm("Delete this commitment?")) {
+    try {
+      await fetch(API + `/recurring/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + TOKEN }
+      });
+      await loadItems();
+      render();
+      showToast("Commitment Removed 🗑️");
+    } catch (e) {
+      alert("Delete failed");
+    }
+  }
+}
+
+function daysUntilDue(dueDay){
+  const today = new Date();
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  
+  // Create a proper date object for the due date this month
+  let dueDate = new Date(currentYear, currentMonth, dueDay);
+  
+  // Handle case where month doesn't have that many days (e.g., Feb 30 -> Mar 2)
+  if (dueDate.getMonth() !== currentMonth && dueDay > 28) {
+     // If the day overflows the month, let's treat the last day of the month as due date
+     dueDate = new Date(currentYear, currentMonth + 1, 0); 
+  }
+  
+  if (dueDate.getDate() >= currentDay) {
+    return dueDate.getDate() - currentDay;
+  } else {
+    // Due next month
+    let nextMonthDueDate = new Date(currentYear, currentMonth + 1, dueDay);
+    if (nextMonthDueDate.getMonth() !== ((currentMonth + 1) % 12) && dueDay > 28) {
+       nextMonthDueDate = new Date(currentYear, currentMonth + 2, 0);
+    }
+    const diffTime = Math.abs(nextMonthDueDate - today);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+}
+
+function render(){
+  const list = document.getElementById('list');
+  list.innerHTML="";
+  
+  let total=0;
+
+  if(items.length === 0) {
+    list.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: var(--muted); background: rgba(0,0,0,0.02); border-radius: 12px; margin-top: 10px;">No active commitments tracked.</div>`;
+    animateValue(document.getElementById('totalMonthly'), 0, 0, 500);
+    return;
+  }
+
+  // Sort by due soonest
+  const sortedItems = [...items].sort((a,b) => daysUntilDue(a.dueDay) - daysUntilDue(b.dueDay));
+
+  let htmlContent = "";
+  sortedItems.forEach((item, i)=>{
+    total += Number(item.amount);
+    
+    // Fallback for older items without IDs
+    const currentId = item.id || i;
+
+    const daysLeft = daysUntilDue(item.dueDay);
+    const dueSoon = daysLeft <= 3;
+    
+    const iconClass = item.type === 'emi' ? 'ri-bank-card-line' : 'ri-refresh-line';
+    const bgClass = item.type === 'emi' ? 'emi-icon' : 'sub-icon';
+    const badgeClass = item.type === 'emi' ? 'badge-emi' : 'badge-sub';
+    const typeText = item.type === 'emi' ? 'EMI' : 'Sub';
+    const monthsText = item.months ? ` • ${item.months} mo left` : '';
+
+    htmlContent += `
+      <div class="item-row">
+        <div class="item-left">
+          <div class="item-icon ${bgClass}">
+            <i class="${iconClass}"></i>
+          </div>
+          <div class="item-details">
+            <h4>${item.name}</h4>
+            <div class="meta">
+              <span class="badge ${badgeClass}">${typeText}</span>
+              <span>Due: ${item.dueDay}${suffix(item.dueDay)}${monthsText}</span>
+              ${dueSoon ? `<span class="badge badge-warning"><i class="ri-alert-fill"></i> In ${daysLeft}d</span>` : `<span style="opacity: 0.7;">(In ${daysLeft} days)</span>`}
+            </div>
+          </div>
+        </div>
+
+        <div class="item-right">
+          <div class="item-amount">₹${parseFloat(item.amount).toLocaleString('en-IN')}</div>
+          <button class="btn-danger-icon" onclick="deleteItem(${currentId})">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+  list.innerHTML = htmlContent;
+
+  animateValue(document.getElementById('totalMonthly'), 0, total, 800);
+  checkNotifications();
+}
+
+function suffix(i) {
+    var j = i % 10, k = i % 100;
+    if (j == 1 && k != 11) { return "st"; }
+    if (j == 2 && k != 12) { return "nd"; }
+    if (j == 3 && k != 13) { return "rd"; }
+    return "th";
+}
+
+function checkNotifications(){
+  if(!("Notification" in window)) return;
+  if(Notification.permission === "default"){
+    Notification.requestPermission();
+  }
+
+  items.forEach(item=>{
+    if(daysUntilDue(item.dueDay) === 0){
+      if(Notification.permission === "granted"){
+        new Notification("Payment Due Today!", {
+          body: `${item.name} ₹${item.amount}`,
+          icon: "https://cdn.jsdelivr.net/npm/remixicon@3.5.0/icons/Finance/bank-card-fill.svg"
+        });
+      }
+    }
+  });
+}
+
+window.logout = function(){
+  localStorage.removeItem("token");
+  location.href="index.html";
+};
+
+async function initPage() {
+  await loadItems();
+  render();
+}
+
+initPage();
+</script>
+
+</body>
+</html>

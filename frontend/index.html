@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance App - Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+:root {
+  --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-border: rgba(148, 163, 184, 0.3);
+  --input-focus: #4f46e5;
+  --radius: 24px;
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(135deg, #0f172a, #020617);
+  --card-bg: rgba(15, 23, 42, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --input-bg: rgba(30, 41, 59, 0.5);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-focus: #818cf8;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow: hidden;
+}
+
+.ambient-glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  max-width: 800px;
+  max-height: 800px;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  animation: pulse 8s infinite alternate ease-in-out;
+}
+
+body.dark .ambient-glow {
+  background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, rgba(0,0,0,0) 70%);
+}
+
+@keyframes pulse {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-main);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  padding: 40px;
+  width: 380px;
+  max-width: 90%;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  display: inline-block;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.input-group i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+input {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-main);
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+input:focus + i, input:focus ~ i {
+  color: var(--primary);
+}
+
+button.main {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button.main::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg);
+}
+
+button.main:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(99,102,241,0.4);
+}
+
+button.main:hover:not(:disabled)::after {
+  left: 150%;
+  transition: 0.7s ease-in-out;
+}
+
+button.main:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button.main:disabled {
+  background: var(--text-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+.toggle-mode {
+  margin-top: 24px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.toggle-mode span {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.toggle-mode span:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.message {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: none;
+}
+
+.message.show {
+  display: block;
+  opacity: 1;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+body.dark .success {
+  color: #4ade80;
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+body.dark .error {
+  color: #f87171;
+}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+  <i class="ri-moon-line"></i>
+</button>
+
+<div class="card">
+  <div class="logo-icon"><i class="ri-wallet-3-fill"></i></div>
+  <h2 id="title">Welcome Back</h2>
+  <div class="subtitle" id="subtitle">Enter your details to access your dashboard</div>
+
+  <div class="input-group">
+    <input id="username" placeholder="Username">
+    <i class="ri-user-3-line"></i>
+  </div>
+  
+  <div class="input-group">
+    <input id="password" type="password" placeholder="Password">
+    <i class="ri-lock-password-line"></i>
+  </div>
+
+  <button class="main" id="btn" onclick="submit()">
+    <span id="btnText">Sign In</span>
+    <div class="spinner" id="spin"></div>
+  </button>
+
+  <div class="message" id="msg"></div>
+
+  <div class="toggle-mode" onclick="toggleMode()">
+    <span id="toggleText">Don't have an account? Sign Up</span>
+  </div>
+</div>
+
+<script>
+const API = "";
+let mode = "login";
+
+function updateThemeIcon() {
+  const btn = document.getElementById("themeBtn");
+  if (document.body.classList.contains("dark")) {
+    btn.innerHTML = '<i class="ri-sun-line"></i>';
+  } else {
+    btn.innerHTML = '<i class="ri-moon-line"></i>';
+  }
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  );
+  updateThemeIcon();
+}
+
+if (!localStorage.getItem("theme")) {
+  localStorage.setItem("theme", "dark");
+}
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+updateThemeIcon();
+
+function toggleMode() {
+  const t = document.getElementById("title");
+  const sub = document.getElementById("subtitle");
+  const bText = document.getElementById("btnText");
+  const toggleT = document.getElementById("toggleText");
+  const m = document.getElementById("msg");
+  
+  m.className = "message";
+  m.innerText = "";
+
+  if(mode === "login"){
+    mode = "register";
+    t.innerText = "Create Account";
+    sub.innerText = "Join us and take control of your finances";
+    bText.innerText = "Sign Up";
+    toggleT.innerText = "Already have an account? Sign In";
+  } else {
+    mode = "login";
+    t.innerText = "Welcome Back";
+    sub.innerText = "Enter your details to access your dashboard";
+    bText.innerText = "Sign In";
+    toggleT.innerText = "Don't have an account? Sign Up";
+  }
+}
+
+function submit() {
+  const btn = document.getElementById("btn");
+  const spin = document.getElementById("spin");
+  const bText = document.getElementById("btnText");
+  const msg = document.getElementById("msg");
+
+  bText.style.display = "none";
+  spin.style.display = "block";
+  btn.disabled = true;
+  msg.className = "message";
+  msg.innerText = "";
+
+  fetch(`${API}/${mode}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if(d.token){
+      localStorage.setItem("token", d.token);
+      location.href = "home.html";
+    } else {
+      msg.innerText = d.message || d.error;
+      msg.classList.add("show", d.error ? "error" : "success");
+    }
+  })
+  .catch(() => {
+    msg.innerText = "Server error";
+    msg.classList.add("show", "error");
+  })
+  .finally(() => {
+    spin.style.display = "none";
+    bText.style.display = "inline";
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+finance.db
+# Ignore other common items if necessary, but node_modules is specifically requested.

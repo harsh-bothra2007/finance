@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance App - Split Expenses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --sidebar-bg: rgba(255, 255, 255, 0.8);
+  --card: rgba(255, 255, 255, 0.7);
+  --border: rgba(255, 255, 255, 0.6);
+  --border-subtle: rgba(148, 163, 184, 0.2);
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.3);
+  --primary-text: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --radius: 24px;
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.9);
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(135deg, #020617, #0f172a);
+  --sidebar-bg: rgba(15, 23, 42, 0.7);
+  --card: rgba(30, 41, 59, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-glow: rgba(99, 102, 241, 0.3);
+  --primary-text: #ffffff;
+  --success: #22c55e;
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --input-bg: rgba(15, 23, 42, 0.8);
+}
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  transition: background 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.layout { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo i { font-size: 28px; color: var(--primary); -webkit-text-fill-color: initial; }
+
+.sidebar nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+.sidebar nav a {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 16px;
+  color: var(--muted); text-decoration: none;
+  font-weight: 500; font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.sidebar nav a i { font-size: 20px; transition: transform 0.3s ease; }
+.sidebar nav a:hover {
+  background: rgba(99, 102, 241, 0.08); color: var(--text); transform: translateX(4px);
+}
+.sidebar nav a.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  color: var(--primary); border-color: rgba(99,102,241,0.2); font-weight: 600;
+}
+.sidebar nav a.active i { color: var(--primary); }
+
+.bottom-actions { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+
+.btn-sidebar {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px; border-radius: 16px; font-weight: 600; font-size: 15px;
+  cursor: pointer; transition: all 0.3s ease;
+  border: 1px solid var(--border-subtle); background: transparent; color: var(--text);
+}
+.btn-sidebar:hover { background: var(--border-subtle); transform: translateY(-2px); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  padding: 40px 60px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container { max-width: 1000px; margin: auto; display: flex; flex-direction: column; gap: 32px; }
+
+h2, h3 { font-weight: 600; margin: 0 0 20px 0; letter-spacing: -0.5px; }
+h2 { font-size: 24px; }
+h3 { font-size: 18px; color: var(--muted); }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s ease;
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+.hero h1 { margin: 0 0 10px 0; font-size: 36px; font-weight: 700; letter-spacing: -1px; }
+.hero .muted { font-size: 18px; margin: 0; }
+
+/* ===== DASHBOARD METRICS ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.metric-box {
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.02);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+body.dark .metric-box { background: rgba(255,255,255,0.02); }
+.metric-box.positive { background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
+.metric-box.negative { background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); }
+.metric-title { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.metric-value { font-size: 32px; font-weight: 700; }
+.metric-positive { color: var(--success); }
+.metric-negative { color: var(--danger); }
+
+/* ===== TWO COLUMN LAYOUT ===== */
+.two-col {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ===== LISTS ===== */
+.item-list { display: flex; flex-direction: column; gap: 12px; }
+.list-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; border-radius: 16px;
+  background: rgba(0,0,0,0.02); border: 1px solid var(--border-subtle);
+  transition: all 0.3s ease; cursor: pointer;
+}
+body.dark .list-item { background: rgba(255,255,255,0.02); }
+.list-item:hover { transform: translateX(4px); background: rgba(0,0,0,0.04); }
+body.dark .list-item:hover { background: rgba(255,255,255,0.04); }
+
+.friend-info { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--primary); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px;
+}
+.friend-name { font-weight: 600; font-size: 16px; }
+.balance-text { font-size: 14px; font-weight: 600; }
+
+/* ===== BUTTONS & INPUTS ===== */
+button {
+  padding: 12px 20px; border-radius: 14px; font-weight: 600; font-family: inherit;
+  font-size: 15px; border: none; cursor: pointer; transition: all 0.3s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+button:active { transform: translateY(1px) !important; }
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white; box-shadow: 0 4px 12px var(--primary-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px var(--primary-glow); }
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
+
+.btn-danger-light {
+    background: rgba(239, 68, 68, 0.1); color: var(--danger);
+}
+.btn-danger-light:hover { background: rgba(239, 68, 68, 0.2); }
+
+input, select {
+  background: var(--input-bg); border: 1px solid var(--border-subtle);
+  color: var(--text); padding: 12px 16px; border-radius: 14px;
+  outline: none; font-family: inherit; font-size: 15px; transition: all 0.3s ease;
+  width: 100%; box-sizing: border-box;
+}
+input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+/* Custom Checkbox mapping for "Who is involved" */
+.checkbox-list { display: flex; flex-direction: column; gap: 10px; }
+.checkbox-item {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  padding: 10px; border-radius: 10px; border: 1px solid var(--border-subtle);
+  transition: all 0.2s;
+}
+.checkbox-item:hover { background: rgba(0,0,0,0.02); }
+body.dark .checkbox-item:hover { background: rgba(255,255,255,0.02); }
+.checkbox-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+
+
+/* ===== MODALS ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+  z-index: 1000; display: none; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-content {
+  background: var(--card); border: 1px solid var(--border);
+  padding: 32px; border-radius: 24px; width: 100%; max-width: 450px;
+  transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-lg); position: relative;
+}
+.modal-overlay.show .modal-content { transform: translateY(0) scale(1); }
+.modal-close {
+  position: absolute; top: 20px; right: 20px; background: none; border: none;
+  font-size: 24px; color: var(--muted); cursor: pointer; padding: 0; display: block;
+}
+.modal-close:hover { color: var(--text); }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--muted); }
+
+/* Ambient Glow Backgrounds */
+.ambient-glow-1, .ambient-glow-2 {
+  position: fixed; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.3; pointer-events: none;
+}
+.ambient-glow-1 {
+  width: 500px; height: 500px; background: rgba(99, 102, 241, 0.15); top: -150px; left: 300px;
+}
+.ambient-glow-2 {
+  width: 600px; height: 600px; background: rgba(168, 85, 247, 0.15); bottom: -200px; right: -100px;
+}
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 30px; right: 30px; background: var(--text); color: var(--bg-gradient);
+  padding: 16px 24px; border-radius: 16px; font-weight: 500; opacity: 0; transition: all 0.3s ease;
+  pointer-events: none; z-index: 2000; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; transform: translateY(20px);
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+body.dark #toast { background: var(--text); color: #0f172a; }
+
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+<div class="ambient-glow-1"></div>
+<div class="ambient-glow-2"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <i class="ri-wallet-3-fill"></i> Finance
+      </div>
+      <nav>
+        <a href="home.html"><i class="ri-home-5-line"></i> Home</a>
+        <a href="dashboard.html"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+        <a href="analytics.html"><i class="ri-pie-chart-2-line"></i> Analytics</a>
+        <a href="stock.html"><i class="ri-stock-line"></i> Investments</a>
+        <a href="splitwise.html" class="active"><i class="ri-group-line"></i> Split Expenses</a>
+        <a href="emi.html"><i class="ri-bank-card-line"></i> EMI & Subs</a>
+      </nav>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-sidebar" id="themeBtn">
+        <i class="ri-moon-line"></i> <span>Dark Mode</span>
+      </button>
+      <button class="btn-sidebar btn-danger" onclick="logout()">
+        <i class="ri-logout-box-r-line"></i> <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="container">
+
+      <div class="hero card">
+        <div>
+          <h1>Split Expenses</h1>
+          <p class="muted">Keep track of shared bills and balances with your friends.</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+           <button class="btn-primary" onclick="openFriendModal()">
+            <i class="ri-user-add-line"></i> Add Friend
+          </button>
+          <button class="btn-success" onclick="openExpenseModal()">
+            <i class="ri-add-circle-line"></i> Add Expense
+          </button>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box positive">
+          <div class="metric-title">Total Owed To You</div>
+          <div class="metric-value metric-positive" id="totalOwedToYou">₹0</div>
+        </div>
+        <div class="metric-box negative">
+          <div class="metric-title">Total You Owe</div>
+          <div class="metric-value metric-negative" id="totalYouOwe">₹0</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        
+        <!-- Left Col: Friends List -->
+        <div class="card">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            Your Friends
+          </h3>
+          <div id="friendsList" class="item-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Right Col: Expense History -->
+        <div class="card">
+          <h3>Recent Shared Expenses</h3>
+          <div class="item-list" id="expenseList">
+             <!-- Rendered via JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Add Friend Modal -->
+<div class="modal-overlay" id="friendModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModals()"><i class="ri-close-line"></i></button>
+    <h2>Add a Friend</h2>
+    <div class="form-group">
+      <label>Friend's Name</label>
+      <input type="text" id="friendName" placeholder="E.g., Alice">
+    </div>
+    <div class="form-group" style="margin-bottom: 0;">
+       <button class="btn-primary" style="width: 100%;" onclick="addFriend()">Add Friend</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Expense Modal -->
+<div class="modal-overlay" id="expenseModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModals()"><i class="ri-close-line"></i></button>
+    <h2>Add an Expense</h2>
+    
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="expDesc" placeholder="Dinner, cab ride, etc.">
+    </div>
+
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" id="expAmount" placeholder="0.00" min="1">
+    </div>
+
+    <div class="form-group">
+      <label>Paid By</label>
+      <select id="expPaidBy">
+         <option value="You">You</option>
+         <!-- Friends added dynamically -->
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Split Equally Among</label>
+      <div id="expSplitAmong" class="checkbox-list">
+         <label class="checkbox-item">
+            <input type="checkbox" value="You" checked disabled>
+            You
+         </label>
+         <!-- Friends added dynamically -->
+      </div>
+      <small style="display:block; margin-top: 8px; color: var(--muted);">Checking 'You' is currently required for MVP calculations.</small>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+       <button class="btn-primary" style="width: 100%;" onclick="addExpense()">Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settle Up Modal -->
+<div class="modal-overlay" id="settleModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModals()"><i class="ri-close-line"></i></button>
+    <h2>Settle Up</h2>
+    <p id="settleDesc" style="color: var(--muted); margin-bottom: 20px; line-height: 1.5;"></p>
+    <div class="form-group" style="margin-bottom: 0;">
+       <button class="btn-success" style="width: 100%;" onclick="confirmSettle()">Record Payment</button>
+    </div>
+    <input type="hidden" id="settleFriendId">
+  </div>
+</div>
+
+
+<div id="toast"><i class="ri-checkbox-circle-fill" style="color:var(--success); font-size:20px;"></i> <span id="toastMsg">Success</span></div>
+
+<script>
+/* ===== INIT / THEME ===== */
+function updateThemeIcon() {
+  const btnIcon = document.querySelector("#themeBtn i");
+  const btnText = document.querySelector("#themeBtn span");
+  if (!btnIcon || !btnText) return;
+  if (document.body.classList.contains("dark")) {
+    btnIcon.className = "ri-sun-line";
+    btnText.innerText = "Light Mode";
+  } else {
+    btnIcon.className = "ri-moon-line";
+    btnText.innerText = "Dark Mode";
+  }
+}
+
+if(!localStorage.getItem("theme")) localStorage.setItem("theme", "dark");
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+updateThemeIcon();
+
+const tBtn = document.getElementById("themeBtn");
+if(tBtn) {
+  tBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    updateThemeIcon();
+  });
+}
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  document.getElementById("toastMsg").innerText = message;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"), 3000);
+}
+
+function logout(){
+  localStorage.removeItem("token");
+  location.href="index.html";
+}
+
+/* ===== SPLITWISE LOGIC ===== */
+
+const API = "";
+const TOKEN = localStorage.getItem("token");
+
+/* ===== SPLITWISE LOGIC ===== */
+
+let splitData = {
+    friends: [],
+    expenses: []
+};
+
+async function loadSplitData() {
+    try {
+        const resFriends = await fetch(API + "/splitwise/friends", {
+            headers: { Authorization: "Bearer " + TOKEN }
+        });
+        const resExpenses = await fetch(API + "/splitwise/expenses", {
+            headers: { Authorization: "Bearer " + TOKEN }
+        });
+        
+        const friends = await resFriends.json();
+        const expenses = await resExpenses.json();
+
+        splitData.friends = friends;
+        // Parse split_among JSON from DB
+        splitData.expenses = expenses.map(e => ({
+            ...e,
+            paidBy: e.paid_by === "You" ? "You" : parseInt(e.paid_by),
+            splitAmong: JSON.parse(e.split_among || "[]"),
+            isSettlement: !!e.is_settlement,
+            settledWith: e.settled_with === "You" ? "You" : parseInt(e.settled_with)
+        }));
+
+        // Migration Check: If server is empty but local has data, upload it
+        const localData = JSON.parse(localStorage.getItem("splitwise_data"));
+        if (splitData.friends.length === 0 && splitData.expenses.length === 0 && localData) {
+            console.log("Migrating local Splitwise data to cloud...");
+            for (const f of localData.friends) {
+                await fetch(API + "/splitwise/friends", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+                    body: JSON.stringify({ name: f.name })
+                });
+            }
+            for (const e of localData.expenses) {
+                await fetch(API + "/splitwise/expenses", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+                    body: JSON.stringify({
+                        description: e.description,
+                        amount: e.amount,
+                        paidBy: e.paidBy,
+                        splitAmong: e.splitAmong,
+                        isSettlement: e.isSettlement,
+                        settledWith: e.settledWith,
+                        date: e.date
+                    })
+                });
+            }
+            localStorage.removeItem("splitwise_data");
+            return loadSplitData(); // Reload from server
+        }
+    } catch (e) {
+        console.error("Splitwise load error", e);
+    }
+}
+
+// Balances maps friendId -> Net balance
+// Positive means they owe you. Negative means you owe them.
+let balances = {};
+
+function calculateBalances() {
+    balances = {};
+    splitData.friends.forEach(f => balances[f.id] = 0);
+
+    splitData.expenses.forEach(exp => {
+        // Only split equally for MVP
+        const totalPeople = exp.splitAmong.length;
+        if (totalPeople === 0) return;
+        
+        const splitAmount = exp.amount / totalPeople;
+
+        if (exp.paidBy === "You") {
+            // You paid. Everyone else in the list owes you splitAmount
+            exp.splitAmong.forEach(personId => {
+                if (personId !== "You") {
+                    balances[personId] = (balances[personId] || 0) + splitAmount;
+                }
+            });
+        } else {
+            // A friend paid.
+            const payerId = exp.paidBy;
+            
+            // If you are in the split list, you owe the payer
+            if (exp.splitAmong.includes("You")) {
+                balances[payerId] = (balances[payerId] || 0) - splitAmount;
+            }
+
+            // If other friends are in the list, technically they owe the payer.
+            // For this UI, we only track "Your" balances against friends.
+            // Complex multi-way balances can get tricky, so we simplify: 
+            // the dashboard strictly tracks "Me vs Friend X".
+            
+            // Note: If friend A pays for you and friend B, friend B owes friend A.
+            // Our direct balance array only tracks what YOU owe A, or A owes YOU.
+        }
+    });
+}
+
+function renderDashboard() {
+    calculateBalances();
+
+    // 1. Render Metrics
+    let totalOwed = 0;
+    let totalOwe = 0;
+
+    Object.values(balances).forEach(bal => {
+        if (bal > 0) totalOwed += bal;
+        else if (bal < 0) totalOwe += Math.abs(bal);
+    });
+
+    document.getElementById("totalOwedToYou").innerText = `₹${totalOwed.toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 2})}`;
+    document.getElementById("totalYouOwe").innerText = `₹${totalOwe.toLocaleString('en-IN', {minimumFractionDigits: 0, maximumFractionDigits: 2})}`;
+
+    // 2. Render Friends List
+    const fList = document.getElementById("friendsList");
+    fList.innerHTML = "";
+    
+    if (splitData.friends.length === 0) {
+        fList.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 14px;">No friends added yet.</div>`;
+    }
+
+    splitData.friends.forEach(f => {
+        const bal = balances[f.id] || 0;
+        let balText = `<span style="color: var(--muted)">Settled</span>`;
+        let settleBtn = '';
+
+        if (bal > 0.01) {
+            balText = `<span class="metric-positive">Owes you ₹${bal.toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>`;
+            settleBtn = `<button class="btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="openSettleModal(${f.id}, ${bal}, true)">Settle</button>`;
+        } else if (bal < -0.01) {
+            balText = `<span class="metric-negative">You owe ₹${Math.abs(bal).toLocaleString('en-IN', {maximumFractionDigits: 2})}</span>`;
+            settleBtn = `<button class="btn-success" style="padding: 6px 12px; font-size: 13px;" onclick="openSettleModal(${f.id}, ${Math.abs(bal)}, false)">Settle</button>`;
+        } else {
+            settleBtn = `<button class="btn-danger-light" style="padding: 6px 12px; font-size: 13px;" onclick="deleteFriend(${f.id})"><i class="ri-delete-bin-line" style="margin:0;"></i></button>`;
+        }
+
+        fList.innerHTML += `
+            <div class="list-item">
+                <div class="friend-info">
+                    <div class="avatar">${f.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                        <div class="friend-name">${f.name}</div>
+                        <div class="balance-text">${balText}</div>
+                    </div>
+                </div>
+                <div>${settleBtn}</div>
+            </div>
+        `;
+    });
+
+    // 3. Render Expense History
+    const eList = document.getElementById("expenseList");
+    eList.innerHTML = "";
+    
+    if (splitData.expenses.length === 0) {
+        eList.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--muted);">No shared expenses recorded.</div>`;
+    }
+
+    // Sort newest first
+    const sortedExp = [...splitData.expenses].sort((a,b) => b.id - a.id);
+
+    sortedExp.forEach(e => {
+        let payerName = e.paidBy === "You" ? "You paid" : getFriendName(e.paidBy) + " paid";
+        let actionDesc = "";
+        
+        if (e.isSettlement) {
+            actionDesc = e.paidBy === "You" ? `You paid ${getFriendName(e.settledWith)}` : `${getFriendName(e.paidBy)} paid you`;
+            eList.innerHTML += `
+                <div class="list-item">
+                    <div class="friend-info">
+                        <div class="avatar" style="background: var(--success);"><i class="ri-check-line"></i></div>
+                        <div>
+                            <div class="friend-name">Settlement</div>
+                            <div class="balance-text" style="color: var(--muted); font-weight: 400; font-size: 13px;">${actionDesc}</div>
+                        </div>
+                    </div>
+                    <div class="friend-name">₹${e.amount}</div>
+                </div>
+            `;
+        } else {
+            eList.innerHTML += `
+                <div class="list-item" style="cursor: default;">
+                    <div class="friend-info">
+                         <div class="avatar" style="background: var(--card); border: 1px solid var(--border-subtle); color: var(--text);">
+                            <i class="ri-receipt-line"></i>
+                        </div>
+                        <div>
+                            <div class="friend-name">${e.description}</div>
+                            <div class="balance-text" style="color: var(--muted); font-weight: 400; font-size: 13px;">
+                                ${payerName} ₹${e.amount}
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-danger-light" style="padding: 6px 12px; font-size: 13px;" onclick="deleteExpense(${e.id})"><i class="ri-delete-bin-line" style="margin:0;"></i></button>
+                </div>
+            `;
+        }
+    });
+
+    populateSelects();
+}
+
+function getFriendName(id) {
+    if (id === "You") return "You";
+    const friend = splitData.friends.find(f => f.id == id);
+    return friend ? friend.name : "Unknown";
+}
+
+/* ===== MODAL CONTROLS ===== */
+function closeModals() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
+}
+
+function populateSelects() {
+    // Expense Modal: Paid By
+    const paidBy = document.getElementById("expPaidBy");
+    paidBy.innerHTML = `<option value="You">You</option>`;
+    splitData.friends.forEach(f => {
+        paidBy.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+    });
+
+    // Expense Modal: Split Among checkboxes
+    const splitAmong = document.getElementById("expSplitAmong");
+    splitAmong.innerHTML = `
+        <label class="checkbox-item">
+            <input type="checkbox" value="You" checked disabled>
+            You
+        </label>
+    `;
+    splitData.friends.forEach(f => {
+        splitAmong.innerHTML += `
+            <label class="checkbox-item">
+                <input type="checkbox" value="${f.id}" class="split-cb">
+                ${f.name}
+            </label>
+        `;
+    });
+}
+
+function openFriendModal() {
+    document.getElementById("friendName").value = "";
+    document.getElementById("friendModal").classList.add("show");
+}
+
+function openExpenseModal() {
+    if (splitData.friends.length === 0) {
+        alert("Please add a friend first before adding an expense.");
+        return;
+    }
+    document.getElementById("expDesc").value = "";
+    document.getElementById("expAmount").value = "";
+    
+    // reset checkboxes
+    document.querySelectorAll('.split-cb').forEach(cb => cb.checked = false);
+
+    document.getElementById("expenseModal").classList.add("show");
+}
+
+/* ===== ACTIONS ===== */
+async function addFriend() {
+    const name = document.getElementById("friendName").value.trim();
+    if (!name) return;
+
+    try {
+        await fetch(API + "/splitwise/friends", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+            body: JSON.stringify({ name: name })
+        });
+        closeModals();
+        await loadSplitData();
+        renderDashboard();
+        showToast(`Added ${name} directly to friends!`);
+    } catch (e) {
+        alert("Failed to add friend");
+    }
+}
+
+async function deleteFriend(id) {
+    if(confirm("Are you sure you want to remove this friend?")) {
+        await fetch(API + `/splitwise/friends/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: "Bearer " + TOKEN }
+        });
+        await loadSplitData();
+        renderDashboard();
+        showToast("Friend removed.");
+    }
+}
+
+async function addExpense() {
+    const desc = document.getElementById("expDesc").value.trim();
+    const amount = parseFloat(document.getElementById("expAmount").value);
+    const paidBy = document.getElementById("expPaidBy").value;
+    
+    const splitArray = ["You"];
+    document.querySelectorAll('.split-cb:checked').forEach(cb => {
+        splitArray.push(cb.value);
+    });
+
+    if (!desc || isNaN(amount) || amount <= 0) {
+        alert("Please provide a valid description and amount.");
+        return;
+    }
+
+    if (splitArray.length < 2) {
+        alert("Please select at least one friend to split with.");
+        return;
+    }
+
+    try {
+        await fetch(API + "/splitwise/expenses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+            body: JSON.stringify({
+                description: desc,
+                amount: amount,
+                paidBy: paidBy === "You" ? "You" : parseInt(paidBy),
+                splitAmong: splitArray.map(val => val === "You" ? "You" : parseInt(val)),
+                date: new Date().toISOString()
+            })
+        });
+        closeModals();
+        await loadSplitData();
+        renderDashboard();
+        showToast("Shared expense added! 💳");
+    } catch (e) {
+        alert("Failed to save expense");
+    }
+}
+
+async function deleteExpense(id) {
+    if(confirm("Delete this expense? This will affect balances.")) {
+        await fetch(API + `/splitwise/expenses/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: "Bearer " + TOKEN }
+        });
+        await loadSplitData();
+        renderDashboard();
+        showToast("Expense deleted.");
+    }
+}
+
+/* ===== SETTLE UP ===== */
+let activeSettleBal = 0;
+let activeSettlePayer = null; // Who is paying whom
+
+function openSettleModal(friendId, amountToSettle, friendOwesYou) {
+    const friendName = getFriendName(friendId);
+    let desc = "";
+
+    if (friendOwesYou) {
+        desc = `Record a cash payment from <b>${friendName}</b> to <b>You</b> for ₹${amountToSettle.toLocaleString('en-IN', {maximumFractionDigits: 2})}.`;
+        activeSettlePayer = friendId; // friend pays you
+    } else {
+        desc = `Record a cash payment from <b>You</b> to <b>${friendName}</b> for ₹${amountToSettle.toLocaleString('en-IN', {maximumFractionDigits: 2})}.`;
+        activeSettlePayer = "You"; // you pay friend
+    }
+
+    document.getElementById("settleDesc").innerHTML = desc;
+    document.getElementById("settleFriendId").value = friendId;
+    activeSettleBal = amountToSettle;
+    
+    document.getElementById("settleModal").classList.add("show");
+}
+
+async function confirmSettle() {
+    const friendId = parseInt(document.getElementById("settleFriendId").value);
+    
+    let paidBy;
+    let settledWith;
+
+    if (activeSettlePayer === "You") {
+        paidBy = "You";
+        settledWith = friendId;
+    } else {
+        paidBy = friendId;
+        settledWith = "You";
+    }
+
+    try {
+        await fetch(API + "/splitwise/expenses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+            body: JSON.stringify({
+                description: "Settlement",
+                isSettlement: true,
+                amount: activeSettleBal,
+                paidBy: paidBy,
+                settledWith: settledWith,
+                splitAmong: [],
+                date: new Date().toISOString()
+            })
+        });
+        closeModals();
+        await loadSplitData();
+        renderDashboard();
+        showToast("Balance settled successfully! 🤝");
+    } catch (e) {
+        alert("Failed to settle");
+    }
+}
+
+// Override calculateBalances to handle settlements
+const oldCalc = calculateBalances;
+calculateBalances = function() {
+    oldCalc(); // do standard math
+    
+    // apply settlements
+    splitData.expenses.forEach(exp => {
+        if (exp.isSettlement) {
+            if (exp.paidBy === "You") {
+                // You paid friend. Decreases what you owe them (increases your balance towards them)
+                balances[exp.settledWith] = (balances[exp.settledWith] || 0) + exp.amount;
+            } else {
+                // Friend paid you. Decreases what they owe you.
+                balances[exp.paidBy] = (balances[exp.paidBy] || 0) - exp.amount;
+            }
+        }
+    });
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadSplitData();
+    renderDashboard();
+});
+
+</script>
+
+</body>
+</html>

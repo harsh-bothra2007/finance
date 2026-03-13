@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance App - Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --sidebar-bg: rgba(255, 255, 255, 0.8);
+  --card: rgba(255, 255, 255, 0.7);
+  --border: rgba(255, 255, 255, 0.6);
+  --border-subtle: rgba(148, 163, 184, 0.2);
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.3);
+  --primary-text: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --danger-text: #ffffff;
+  --radius: 24px;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --chart-grid: rgba(0, 0, 0, 0.05);
+  --chart-text: #64748b;
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(135deg, #020617, #0f172a);
+  --sidebar-bg: rgba(15, 23, 42, 0.7);
+  --card: rgba(30, 41, 59, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-glow: rgba(99, 102, 241, 0.3);
+  --primary-text: #ffffff;
+  --success: #22c55e;
+  --danger: #f87171;
+  --danger-text: #020617;
+  --input-bg: rgba(15, 23, 42, 0.8);
+  --chart-grid: rgba(255, 255, 255, 0.05);
+  --chart-text: #94a3b8;
+}
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  transition: background 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo i {
+  font-size: 28px;
+  color: var(--primary);
+  -webkit-text-fill-color: initial;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.sidebar nav a i {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar nav a:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text);
+  transform: translateX(4px);
+}
+
+.sidebar nav a.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  color: var(--primary);
+  border-color: rgba(99,102,241,0.2);
+  font-weight: 600;
+}
+
+.sidebar nav a.active i {
+  color: var(--primary);
+}
+
+.bottom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.btn-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-sidebar:hover {
+  background: var(--border-subtle);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  padding: 40px 60px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+h2, h3 {
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.5px;
+}
+
+h2 { font-size: 24px; }
+h3 { font-size: 18px; color: var(--muted); }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 32px;
+  margin-bottom: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1));
+  border: 1px solid rgba(99,102,241,0.2);
+}
+
+.hero h1 {
+  margin: 0 0 10px 0;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.hero .muted {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Grid Layouts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 32px;
+}
+
+@media (max-width: 1100px) {
+  .chart-grid { grid-template-columns: 1fr; }
+}
+
+canvas {
+  max-height: 350px;
+  width: 100% !important;
+}
+
+/* Ambient Glow Backgrounds */
+.ambient-glow-1, .ambient-glow-2 {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 0;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.ambient-glow-1 {
+  width: 500px; height: 500px;
+  background: rgba(99, 102, 241, 0.2);
+  top: -150px; left: 300px;
+}
+.ambient-glow-2 {
+  width: 600px; height: 600px;
+  background: rgba(168, 85, 247, 0.15);
+  bottom: -200px; right: -100px;
+}
+
+/* AI Summary Card */
+.ai-summary {
+  background: linear-gradient(to right, rgba(99,102,241,0.05), rgba(168,85,247,0.05));
+  border: 1px solid rgba(168,85,247,0.2);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.stat-item {
+  background: var(--bg-gradient);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item h4 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.stat-item h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-item.income h2 { color: var(--success); }
+.stat-item.expense h2 { color: var(--danger); }
+.stat-item.balance h2 { color: var(--primary); }
+</style>
+</head>
+
+<body>
+<div class="ambient-glow-1"></div>
+<div class="ambient-glow-2"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <i class="ri-wallet-3-fill"></i> Finance
+      </div>
+      <nav>
+        <a href="home.html"><i class="ri-home-5-line"></i> Home</a>
+        <a href="dashboard.html"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+        <a href="analytics.html" class="active"><i class="ri-pie-chart-2-line"></i> Analytics</a>
+        <a href="stock.html"><i class="ri-stock-line"></i> Investments</a>
+        <a href="splitwise.html"><i class="ri-group-line"></i> Split Expenses</a>
+        <a href="emi.html"><i class="ri-bank-card-line"></i> EMI & Subs</a>
+      </nav>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-sidebar"  id="themeBtn">
+        <i class="ri-moon-line"></i> <span>Dark Mode</span>
+      </button>
+      <button class="btn-sidebar btn-danger" onclick="logout()">
+        <i class="ri-logout-box-r-line"></i> <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="container">
+
+      <div class="hero card">
+        <div>
+          <h1>Analytics Overview</h1>
+          <p class="muted">Visualize your financial journey and track spending patterns.</p>
+        </div>
+        <i class="ri-bar-chart-box-line" style="font-size: 64px; color: var(--primary); opacity: 0.8;"></i>
+      </div>
+
+      <!-- AI SUMMARY STATS -->
+      <div class="card ai-summary">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom: 8px;">
+          <div style="width:40px; height:40px; border-radius:12px; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-size:20px;">
+            <i class="ri-robot-2-fill"></i>
+          </div>
+          <h2 style="margin:0;">AI Financial Summary</h2>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-item income">
+            <h4>Total Income</h4>
+            <h2 id="incomeAmount">₹0</h2>
+          </div>
+          <div class="stat-item expense">
+            <h4>Total Expense</h4>
+            <h2 id="expenseAmount">₹0</h2>
+          </div>
+          <div class="stat-item balance">
+            <h4>Net Balance</h4>
+            <h2 id="balanceAmount">₹0</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <!-- CATEGORY PIE -->
+        <div class="card" style="display:flex; flex-direction:column; align-items:center;">
+          <h3 style="align-self:flex-start;">Category Distribution</h3>
+          <div style="position:relative; width:100%; height:300px; display:flex; justify-content:center;">
+            <canvas id="pie"></canvas>
+          </div>
+          <p id="totalSpentLabel" style="margin-top:20px; font-weight:600; color:var(--text); font-size:18px;"></p>
+        </div>
+
+        <!-- LINE CHART -->
+        <div class="card">
+          <h3>Yearly Cash Flow (<span id="currentYearSpan"></span>)</h3>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const TOKEN = localStorage.getItem("token");
+const API = "";
+if(!TOKEN) location.href="index.html";
+
+/* ===== THEME ===== */
+function updateThemeIcon() {
+  const btnIcon = document.querySelector("#themeBtn i");
+  const btnText = document.querySelector("#themeBtn span");
+  if (document.body.classList.contains("dark")) {
+    btnIcon.className = "ri-sun-line";
+    btnText.innerText = "Light Mode";
+  } else {
+    btnIcon.className = "ri-moon-line";
+    btnText.innerText = "Dark Mode";
+  }
+}
+
+if(!localStorage.getItem("theme")) localStorage.setItem("theme", "dark");
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+updateThemeIcon();
+
+const tBtn = document.getElementById("themeBtn");
+if(tBtn) {
+  tBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark")?"dark":"light");
+    updateThemeIcon();
+    load();
+    loadYearChart();
+  });
+}
+
+function logout(){
+  localStorage.removeItem("token");
+  location.href="index.html";
+}
+
+let pieChart;
+let lineChart;
+
+/* Modern Color Palette for Pie Chart */
+const pieColors = [
+  '#6366f1', // Indigo
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#f43f5e', // Rose
+  '#f59e0b', // Amber
+  '#10b981', // Emerald
+  '#0ea5e9', // Sky
+  '#64748b'  // Slate
+];
+
+// Simple Number Animation
+function animateValue(obj, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(easeOut * (end - start) + start);
+    obj.innerHTML = `₹${current.toLocaleString('en-IN')}`;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      obj.innerHTML = `₹${end.toLocaleString('en-IN')}`;
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+/* ===== LOAD SUMMARY STATS ===== */
+async function loadSummaryStats(){
+  try {
+    const res = await fetch(API + "/summary", {
+      headers: { Authorization: "Bearer " + TOKEN }
+    });
+    const data = await res.json();
+
+    const incEl = document.getElementById("incomeAmount");
+    const expEl = document.getElementById("expenseAmount");
+    const balEl = document.getElementById("balanceAmount");
+
+    animateValue(incEl, 0, data.income || 0, 1000);
+    animateValue(expEl, 0, data.expense || 0, 1000);
+    animateValue(balEl, 0, (data.income || 0) - (data.expense || 0), 1000);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+/* ===== LOAD DATA ===== */
+function load(){
+  fetch(API+"/expenses",{headers:{Authorization:"Bearer "+TOKEN}})
+    .then(r=>r.json())
+    .then(draw);
+}
+
+/* ===== DRAW PIE ===== */
+function draw(data){
+  let catData={};
+  data.forEach(e=>{
+    catData[e.category]=(catData[e.category]||0)+Number(e.amount);
+  });
+
+  const isDark = document.body.classList.contains("dark");
+  const textColor = isDark ? '#f8fafc' : '#0f172a';
+
+  if(pieChart) pieChart.destroy();
+
+  const ctx = document.getElementById('pie').getContext('2d');
+  pieChart = new Chart(ctx, {
+    type: "doughnut",
+    data:{
+      labels:Object.keys(catData),
+      datasets:[{
+        data:Object.values(catData),
+        backgroundColor: pieColors,
+        borderWidth: isDark ? 4 : 2,
+        borderColor: isDark ? '#1e293b' : '#ffffff',
+        hoverOffset: 10
+      }]
+    },
+    options:{
+      cutout: '65%',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins:{
+        legend:{
+          position:"bottom",
+          labels: {
+            color: textColor,
+            padding: 20,
+            font: { family: "'Outfit', sans-serif", size: 13, weight: 500 }
+          }
+        },
+        datalabels:{
+          color:"#fff",
+          font: { weight: 'bold', family: "'Outfit', sans-serif" },
+          formatter:(v,ctx)=>{
+            const sum=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+            const percentage = ((v/sum)*100).toFixed(0);
+            return percentage > 5 ? percentage + "%" : "";
+          }
+        }
+      }
+    }
+  });
+
+  const total = Object.values(catData).reduce((a,b)=>a+b,0);
+  const label = document.getElementById("totalSpentLabel");
+  label.innerText = total ? `Total Tracked Expense: ₹${total.toLocaleString('en-IN')}` : "No expense data available";
+}
+
+/* ===== DRAW LINE CHART ===== */
+async function loadYearChart() {
+  const year = new Date().getFullYear();
+  document.getElementById("currentYearSpan").innerText = year;
+
+  try {
+    const res = await fetch(API + "/summary/year?year=" + year, {
+      headers: { Authorization: "Bearer " + TOKEN }
+    });
+    const data = await res.json();
+
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const incomeData = new Array(12).fill(0);
+    const expenseData = new Array(12).fill(0);
+
+    if(data.income) {
+      data.income.forEach(item => {
+        incomeData[parseInt(item.month) - 1] = Number(item.total);
+      });
+    }
+
+    if(data.expense) {
+      data.expense.forEach(item => {
+        expenseData[parseInt(item.month) - 1] = Number(item.total);
+      });
+    }
+
+    const isDark = document.body.classList.contains("dark");
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+
+    const ctx = document.getElementById("lineChart").getContext("2d");
+
+    // Gradients for line chart
+    const incGradient = ctx.createLinearGradient(0, 0, 0, 350);
+    incGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    incGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+    const expGradient = ctx.createLinearGradient(0, 0, 0, 350);
+    expGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
+    expGradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+    if (lineChart) lineChart.destroy();
+
+    lineChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: "Income",
+            data: incomeData,
+            borderColor: "#10b981",
+            backgroundColor: incGradient,
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: "#10b981",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          {
+            label: "Expense",
+            data: expenseData,
+            borderColor: "#ef4444",
+            backgroundColor: expGradient,
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: "#ef4444",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }
+        ]
+      },
+      options:{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{
+          legend:{
+            position: 'top',
+            align: 'end',
+            labels:{
+              color: isDark ? '#f8fafc' : '#0f172a',
+              usePointStyle: true,
+              boxWidth: 8,
+              font: { family: "'Outfit', sans-serif", size: 13, weight: 500 }
+            }
+          },
+          datalabels: { display: false } // Hide datalabels on line chart
+        },
+        scales:{
+          x:{
+            grid: { display: false },
+            ticks: { color: textColor, font: { family: "'Outfit', sans-serif" } }
+          },
+          y:{
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { 
+              color: textColor, 
+              font: { family: "'Outfit', sans-serif" },
+              callback: function(value) {
+                if (value === 0) return '0';
+                if (value >= 1000) return '₹' + (value / 1000) + 'k';
+                return '₹' + value;
+              }
+            },
+            beginAtZero: true
+          }
+        },
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+      }
+    });
+
+  } catch(e) {
+    console.error("Failed to load year chart", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadSummaryStats();
+  load();
+  loadYearChart();
+});
+</script>
+</body>
+</html>

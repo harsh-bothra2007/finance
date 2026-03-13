@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance App - Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --sidebar-bg: rgba(255, 255, 255, 0.8);
+  --card: rgba(255, 255, 255, 0.7);
+  --border: rgba(255, 255, 255, 0.6);
+  --border-subtle: rgba(148, 163, 184, 0.2);
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.3);
+  --primary-text: #ffffff;
+  --success: #10b981;
+  --danger: #ef4444;
+  --danger-text: #ffffff;
+  --radius: 24px;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.9);
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(135deg, #020617, #0f172a);
+  --sidebar-bg: rgba(15, 23, 42, 0.7);
+  --card: rgba(30, 41, 59, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-glow: rgba(99, 102, 241, 0.3);
+  --primary-text: #ffffff;
+  --success: #22c55e;
+  --danger: #f87171;
+  --danger-text: #020617;
+  --input-bg: rgba(15, 23, 42, 0.8);
+}
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  transition: background 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo i {
+  font-size: 28px;
+  color: var(--primary);
+  -webkit-text-fill-color: initial;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.sidebar nav a i {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar nav a:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text);
+  transform: translateX(4px);
+}
+
+.sidebar nav a.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  color: var(--primary);
+  border-color: rgba(99,102,241,0.2);
+  font-weight: 600;
+}
+
+.sidebar nav a.active i {
+  color: var(--primary);
+}
+
+.bottom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.btn-sidebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-sidebar:hover {
+  background: var(--border-subtle);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  padding: 40px 60px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.5px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 32px;
+  margin-bottom: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== BUTTON SYSTEM ===== */
+button {
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:active {
+  transform: translateY(1px) !important;
+}
+
+.add-btn, button.primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.add-btn:hover, button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--primary-glow);
+}
+
+.delete-btn, button.danger {
+  background: var(--danger);
+  color: white;
+}
+
+.delete-btn:hover, button.danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+}
+
+.secondary:hover {
+  background: var(--border-subtle);
+  transform: translateY(-2px);
+}
+
+/* ===== INPUTS ===== */
+input, select {
+  background: var(--input-bg);
+  border: 1px solid var(--border-subtle);
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 14px;
+  outline: none;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+body.dark ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.filter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+/* ===== SUMMARY ROW IN DASHBOARD ===== */
+.summary-inline-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+
+.summary-inline-item {
+  padding: 20px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+}
+
+body.dark .summary-inline-item {
+  background: rgba(255,255,255,0.02);
+}
+
+.summary-inline-item p {
+  margin: 0 0 8px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.summary-inline-item span {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.summary-inline-item:nth-child(1) span { color: var(--success); }
+.summary-inline-item:nth-child(2) span { color: var(--danger); }
+.summary-inline-item:nth-child(3) span { color: var(--primary); }
+
+/* ===== MODALS ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: var(--card);
+  padding: 32px;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.95) translateY(20px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal.show .modal-card {
+  transform: scale(1) translateY(0);
+}
+
+.modal-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+}
+
+.modal-card input {
+  width: 100%;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* FullCalendar Overrides */
+.fc-theme-standard td, .fc-theme-standard th {
+  border-color: var(--border-subtle);
+}
+.fc-theme-standard .fc-scrollgrid {
+  border-color: var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.fc .fc-toolbar-title {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 20px;
+}
+.fc .fc-button-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  font-family: inherit;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+.fc .fc-button-primary:hover {
+  background: var(--primary-hover) !important;
+}
+.fc-daygrid-day-number {
+  color: var(--text);
+  font-weight: 500;
+}
+.fc-col-header-cell-cushion {
+  color: var(--text);
+  padding: 12px 0 !important;
+}
+
+/* Day Row styling in modal */
+.day-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  background: rgba(0,0,0,0.03);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s;
+}
+
+body.dark .day-row {
+  background: rgba(255,255,255,0.02);
+}
+
+.day-row:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+body.dark .day-row:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.day-row button {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+/* Ambient Glow Backgrounds */
+.ambient-glow-1, .ambient-glow-2 {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 0;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.ambient-glow-1 {
+  width: 500px; height: 500px;
+  background: rgba(99, 102, 241, 0.2);
+  top: -150px; left: 300px;
+}
+.ambient-glow-2 {
+  width: 600px; height: 600px;
+  background: rgba(168, 85, 247, 0.15);
+  bottom: -200px; right: -100px;
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--text);
+  color: var(--bg-gradient);
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2000;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(20px);
+}
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+body.dark #toast {
+  background: var(--text);
+  color: #0f172a;
+}
+</style>
+</head>
+
+<body>
+<div class="ambient-glow-1"></div>
+<div class="ambient-glow-2"></div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal">
+  <div class="modal-card">
+    <h3>Delete expense?</h3>
+    <p class="muted">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="delete-btn" onclick="deleteConfirmed()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT EXPENSE MODAL -->
+<div id="editModal" class="modal">
+  <div class="modal-card">
+    <h3>Edit Expense</h3>
+    <input type="date" id="editDate">
+    <input type="number" id="editAmount" placeholder="Amount">
+    <input id="editCategory" placeholder="Category">
+    <input id="editRemark" placeholder="Remark">
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="delete-btn" onclick="deleteFromEdit()"><i class="ri-delete-bin-line"></i></button>
+      <button class="add-btn" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAY MODAL -->
+<div id="dayModal" class="modal">
+  <div class="modal-card" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+    <h3>Daily Expenses</h3>
+    <div id="dayExpenseList" style="margin-top: 16px;"></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeDayModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- INCOME LIST MODAL -->
+<div id="incomeModal" class="modal">
+  <div class="modal-card" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+    <h3>Income Details</h3>
+    <div id="incomeList" style="margin-top: 16px;"></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeIncomeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT INCOME MODAL -->
+<div id="editIncomeModal" class="modal">
+  <div class="modal-card">
+    <h3>Edit Income</h3>
+    <input type="date" id="editIncomeDate">
+    <input type="number" id="editIncomeAmount" placeholder="Amount">
+    <input id="editIncomeSource" placeholder="Source">
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeEditIncomeModal()">Cancel</button>
+      <button class="add-btn" onclick="saveIncomeEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <i class="ri-wallet-3-fill"></i> Finance
+      </div>
+      <nav>
+        <a href="home.html"><i class="ri-home-5-line"></i> Home</a>
+        <a href="dashboard.html" class="active"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+        <a href="analytics.html"><i class="ri-pie-chart-2-line"></i> Analytics</a>
+        <a href="stock.html"><i class="ri-stock-line"></i> Investments</a>
+        <a href="splitwise.html"><i class="ri-group-line"></i> Split Expenses</a>
+        <a href="emi.html"><i class="ri-bank-card-line"></i> EMI & Subs</a>
+      </nav>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="btn-sidebar" id="themeBtn">
+        <i class="ri-moon-line"></i> <span>Dark Mode</span>
+      </button>
+      <button class="btn-sidebar btn-danger" onclick="logout()">
+        <i class="ri-logout-box-r-line"></i> <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <div class="container">
+
+      <!-- SUMMARY -->
+      <div class="card">
+        <h2>Financial Overview</h2>
+        <div class="summary-inline-grid">
+          <div class="summary-inline-item">
+            <p>Total Monthly Income</p>
+            <span id="incomeAmount">₹0</span>
+          </div>
+          <div class="summary-inline-item">
+            <p>Total Monthly Expense</p>
+            <span id="expenseAmount">₹0</span>
+          </div>
+          <div class="summary-inline-item">
+            <p>Net Balance</p>
+            <span id="balanceAmount">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD TRANSACTIONS -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+        <div class="card" style="margin-bottom: 0;">
+          <h2><i class="ri-arrow-right-up-line" style="color:var(--danger)"></i> Add Expense</h2>
+          <div class="filter">
+            <input id="amount" type="number" placeholder="Amount (₹)">
+            <input id="date" type="date">
+            <input id="category" placeholder="Category" list="categoryList">
+            <datalist id="categoryList"></datalist>
+            <input id="remark" placeholder="Remark" list="remarkList">
+            <datalist id="remarkList"></datalist>
+            <button class="add-btn" onclick="addExpense()" style="grid-column: 1 / -1;"><i class="ri-add-line"></i> Save Expense</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0;">
+          <h2><i class="ri-arrow-right-down-line" style="color:var(--success)"></i> Add Income</h2>
+          <div class="filter">
+            <input id="incomeInputAmount" type="number" placeholder="Amount (₹)">
+            <input id="incomeDate" type="date">
+            <input id="incomeSource" placeholder="Source (Salary, Freelance)" style="grid-column: 1 / -1;">
+            <button class="add-btn" onclick="addIncome()" style="grid-column: 1 / -1; background: var(--success); box-shadow: 0 4px 12px rgba(16,185,129,0.3);"><i class="ri-add-line"></i> Save Income</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div class="card" style="margin-top: 32px;">
+        <h2>Transactions Calendar</h2>
+        <div id="calendar" style="margin-top:20px;"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast"><i class="ri-checkbox-circle-fill" style="color:var(--success); font-size:20px;"></i> <span id="toastMsg">Success</span></div>
+
+<script>
+function normalizeCategory(text){
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+let currentEditId = null;
+let currentIncomeId = null;
+const API="";
+const TOKEN=localStorage.getItem("token");
+
+if(!TOKEN) location.href="index.html";
+
+/* ===== THEME ===== */
+function updateThemeIcon() {
+  const btnIcon = document.querySelector("#themeBtn i");
+  const btnText = document.querySelector("#themeBtn span");
+  if (!btnIcon || !btnText) return;
+  if (document.body.classList.contains("dark")) {
+    btnIcon.className = "ri-sun-line";
+    btnText.innerText = "Light Mode";
+  } else {
+    btnIcon.className = "ri-moon-line";
+    btnText.innerText = "Dark Mode";
+  }
+}
+
+if(!localStorage.getItem("theme")) localStorage.setItem("theme", "dark");
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+updateThemeIcon();
+
+const tBtn = document.getElementById("themeBtn");
+if(tBtn) {
+  tBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark")?"dark":"light");
+    updateThemeIcon();
+  });
+}
+
+/* ===== LOGOUT ===== */
+function logout(){
+  localStorage.removeItem("token");
+  location.href="index.html";
+}
+
+/* ===== DEFAULT DATES ===== */
+function setToday(id){
+  const el = document.getElementById(id);
+  if(el) el.value = new Date().toISOString().slice(0,10);
+}
+
+setToday("date");
+setToday("incomeDate");
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  document.getElementById("toastMsg").innerText = message;
+  toast.classList.add("show");
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  }, 3000);
+}
+
+// Simple Number Animation
+function animateValue(obj, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(easeOut * (end - start) + start);
+    obj.innerHTML = `₹${current.toLocaleString('en-IN')}`;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      obj.innerHTML = `₹${end.toLocaleString('en-IN')}`;
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+/* ============================
+   ADD EXPENSE & INCOME
+============================ */
+function addExpense(){
+  const amountVal = document.getElementById("amount").value;
+  const remarkVal = document.getElementById("remark").value;
+  const categoryVal = document.getElementById("category").value;
+  const dateVal = document.getElementById("date").value;
+
+  if(amountVal <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  fetch(API+"/expenses",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+TOKEN
+    },
+    body: JSON.stringify({
+      amount: amountVal,
+      remark: remarkVal,
+      category: normalizeCategory(categoryVal),
+      date: dateVal
+    })
+  }).then(()=>{
+    document.getElementById("amount").value="";
+    document.getElementById("remark").value="";
+    document.getElementById("category").value="";
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Expense Added 💰");
+  });
+}
+
+function addIncome(){
+  const amount = incomeInputAmount.value;
+  const source = incomeSource.value;
+  const date = incomeDate.value;
+
+  if(amount <= 0){
+    alert("Invalid income amount");
+    return;
+  }
+
+  if(currentIncomeId){
+    fetch(API + "/income/" + currentIncomeId,{
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:"Bearer "+TOKEN
+      },
+      body: JSON.stringify({ amount, source, date })
+    }).then(()=>{
+      currentIncomeId = null;
+      incomeInputAmount.value="";
+      incomeSource.value="";
+      calendar.refetchEvents();
+      loadSummary();
+      showToast("Income Updated ✅");
+    });
+  } else {
+    fetch(API+"/income",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:"Bearer "+TOKEN
+      },
+      body: JSON.stringify({ amount, source, date })
+    }).then(()=>{
+      incomeInputAmount.value="";
+      incomeSource.value="";
+      calendar.refetchEvents();
+      loadSummary();
+      showToast("Income Added 💵");
+    });
+  }
+}
+
+async function loadSummary(){
+  const month = new Date().toISOString().slice(0,7);
+  try {
+    const res = await fetch(API + "/summary/month?month=" + month, {
+      headers: { Authorization: "Bearer " + TOKEN }
+    });
+    const data = await res.json();
+
+    const incEl = document.getElementById("incomeAmount");
+    const expEl = document.getElementById("expenseAmount");
+    const balEl = document.getElementById("balanceAmount");
+
+    animateValue(incEl, 0, data.totalIncome || 0, 800);
+    animateValue(expEl, 0, data.totalExpense || 0, 800);
+    animateValue(balEl, 0, (data.totalIncome || 0) - (data.totalExpense || 0), 800);
+
+    // Migration Check: If server has no data but local does, upload it.
+    const localExpenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+    const localIncome = JSON.parse(localStorage.getItem("income") || "[]");
+    
+    // Check if server is essentially empty (no summary)
+    if (data.totalIncome === 0 && data.totalExpense === 0 && (localExpenses.length > 0 || localIncome.length > 0)) {
+        console.log("Migrating local dashboard data to cloud...");
+        for (const exp of localExpenses) {
+            await fetch(API + "/expenses", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+                body: JSON.stringify(exp)
+            });
+        }
+        for (const inc of localIncome) {
+            await fetch(API + "/income", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + TOKEN },
+                body: JSON.stringify(inc)
+            });
+        }
+        localStorage.removeItem("expenses");
+        localStorage.removeItem("income");
+        localStorage.removeItem("categories"); // Also clear categories if they exist
+        localStorage.removeItem("remarks");
+        return loadSummary(); // Reload after migration
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+/* ============================
+   CALENDAR INIT
+============================ */
+let calendar;
+document.addEventListener("DOMContentLoaded", function () {
+  const calendarEl = document.getElementById("calendar");
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    initialDate: new Date().toISOString().slice(0,10),
+    buttonText: { today: "Today" },
+    height: 600,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth'
+    },
+    events: async function(fetchInfo, successCallback, failureCallback) {
+      try {
+        const [expenseRes, incomeRes] = await Promise.all([
+          fetch(API+"/expenses", { headers:{ Authorization:"Bearer "+TOKEN }}),
+          fetch(API+"/income", { headers:{ Authorization:"Bearer "+TOKEN }})
+        ]);
+
+        const expenses = await expenseRes.json();
+        const income = await incomeRes.json();
+
+        const events = [];
+
+        // GROUP EXPENSES
+        const groupedExpenses = {};
+        expenses.forEach(e=>{
+          if(!groupedExpenses[e.date]) groupedExpenses[e.date]=[];
+          groupedExpenses[e.date].push(e);
+        });
+
+        Object.keys(groupedExpenses).forEach(date=>{
+          const total = groupedExpenses[date].reduce((sum,e)=> sum + Number(e.amount),0);
+          events.push({
+            title:`₹${total}`,
+            start:date,
+            backgroundColor: "rgba(239, 68, 68, 0.15)",
+            borderColor: "transparent",
+            textColor: "#ef4444",
+            extendedProps:{
+              type:"expense",
+              data:groupedExpenses[date]
+            }
+          });
+        });
+
+        // GROUP INCOME
+        const groupedIncome = {};
+        income.forEach(i=>{
+          if(!groupedIncome[i.date]) groupedIncome[i.date]=[];
+          groupedIncome[i.date].push(i);
+        });
+
+        Object.keys(groupedIncome).forEach(date=>{
+          const total = groupedIncome[date].reduce((sum,i)=> sum + Number(i.amount),0);
+          events.push({
+            title:`+ ₹${total}`,
+            start:date,
+            backgroundColor: "rgba(16, 185, 129, 0.15)",
+            borderColor: "transparent",
+            textColor: "#10b981",
+            extendedProps:{
+              type:"income",
+              data:groupedIncome[date]
+            }
+          });
+        });
+
+        successCallback(events);
+      } catch(err){
+        failureCallback(err);
+      }
+    },
+
+    eventClick: function(info){
+      const type = info.event.extendedProps.type;
+      const data = info.event.extendedProps.data;
+      if(type === "expense") openDayModal(data);
+      if(type === "income") openIncomeModal(data);
+    },
+
+    dateClick: function(info){
+      fetch(API+"/expenses",{
+        headers:{ Authorization:"Bearer "+TOKEN }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const dayExpenses = data.filter(e => e.date === info.dateStr);
+        if(dayExpenses.length === 0){
+          showToast("No expenses for this day");
+          return;
+        }
+        openDayModal(dayExpenses);
+      });
+    }
+  });
+
+  calendar.render();
+  loadSummary();
+});
+
+/* ============================
+   MODAL LOGIC
+============================ */
+function closeEditModal() { currentEditId = null; document.getElementById('editModal').classList.remove('show'); }
+function closeDayModal() { document.getElementById('dayModal').classList.remove('show'); }
+function closeIncomeModal() { document.getElementById('incomeModal').classList.remove('show'); }
+function closeEditIncomeModal() { document.getElementById('editIncomeModal').classList.remove('show'); }
+
+function openDayModal(expenses){
+  const list = document.getElementById("dayExpenseList");
+  list.innerHTML = "";
+  expenses.forEach(exp => {
+    const row = document.createElement("div");
+    row.className = "day-row";
+    row.innerHTML = `
+      <div>
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--danger)">₹${exp.amount}</div>
+        <div style="font-size: 14px; font-weight: 500;">${exp.category}</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top:2px;">${exp.remark || ""}</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="secondary" onclick="editFromDay(${exp.id})"><i class="ri-pencil-line"></i></button>
+        <button class="danger" onclick="deleteFromDay(${exp.id})"><i class="ri-delete-bin-line"></i></button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+  document.getElementById('dayModal').classList.add("show");
+}
+
+function openIncomeModal(incomes){
+  const list = document.getElementById("incomeList");
+  list.innerHTML = "";
+  incomes.forEach(i=>{
+    const row = document.createElement("div");
+    row.className = "day-row";
+    row.innerHTML=`
+      <div>
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--success)">₹${i.amount}</div>
+        <div style="font-size: 14px; font-weight: 500;">${i.source || "Income"}</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="secondary" onclick="editIncome(${i.id})"><i class="ri-pencil-line"></i></button>
+        <button class="danger" onclick="deleteIncome(${i.id})"><i class="ri-delete-bin-line"></i></button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+  document.getElementById('incomeModal').classList.add("show");
+}
+
+/* Edit / Delete Income */
+function editIncome(id){
+  fetch(API+"/income",{ headers:{ Authorization:"Bearer "+TOKEN } })
+  .then(res=>res.json())
+  .then(data=>{
+    const income = data.find(i => i.id == id);
+    if(!income) return;
+    currentIncomeId = income.id;
+    document.getElementById('editIncomeDate').value = income.date;
+    document.getElementById('editIncomeAmount').value = income.amount;
+    document.getElementById('editIncomeSource').value = income.source;
+    document.getElementById('editIncomeModal').classList.add("show");
+  });
+}
+
+function saveIncomeEdit(){
+  const amount = document.getElementById('editIncomeAmount').value;
+  const source = document.getElementById('editIncomeSource').value;
+  const date = document.getElementById('editIncomeDate').value;
+
+  if(amount <= 0){ alert("Invalid amount"); return; }
+  fetch(API+"/income/"+currentIncomeId,{
+    method:"PUT",
+    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+TOKEN },
+    body: JSON.stringify({ amount, source, date })
+  }).then(()=>{
+    closeEditIncomeModal();
+    closeIncomeModal();
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Income Updated 💰");
+  });
+}
+
+function deleteIncome(id){
+  fetch(API+"/income/"+id,{
+    method:"DELETE",
+    headers:{ Authorization:"Bearer "+TOKEN }
+  }).then(()=>{
+    closeIncomeModal();
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Income Deleted 💸");
+  });
+}
+
+/* Edit / Delete Expense */
+function editFromDay(id){
+  closeDayModal();
+  fetch(API+"/expenses",{ headers:{ Authorization:"Bearer "+TOKEN } })
+  .then(res=>res.json())
+  .then(data=>{
+    const exp = data.find(e => e.id == id);
+    if(!exp) return;
+    currentEditId = exp.id;
+    document.getElementById('editDate').value = exp.date;
+    document.getElementById('editAmount').value = exp.amount;
+    document.getElementById('editCategory').value = exp.category;
+    document.getElementById('editRemark').value = exp.remark;
+    document.getElementById('editModal').classList.add("show");
+  });
+}
+
+function deleteFromDay(id){
+  fetch(API+"/expenses/"+id,{
+    method:"DELETE",
+    headers:{ Authorization:"Bearer "+TOKEN }
+  }).then(()=>{
+    closeDayModal();
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Expense Deleted 🗑️");
+  });
+}
+
+function saveEdit(){
+  const amount = document.getElementById('editAmount').value;
+  const category = document.getElementById('editCategory').value;
+  const remark = document.getElementById('editRemark').value;
+  const date = document.getElementById('editDate').value;
+
+  if(amount <= 0){ alert("Invalid amount"); return; }
+  fetch(API + "/expenses/" + currentEditId,{
+    method:"PUT",
+    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+TOKEN },
+    body: JSON.stringify({ amount, category: normalizeCategory(category), remark, date })
+  }).then(()=>{
+    closeEditModal();
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Expense Updated ✅");
+  });
+}
+
+function deleteFromEdit(){
+  fetch(API + "/expenses/" + currentEditId,{
+    method:"DELETE",
+    headers:{ Authorization:"Bearer "+TOKEN }
+  }).then(()=>{
+    closeEditModal();
+    calendar.refetchEvents();
+    loadSummary();
+    showToast("Expense Deleted 🗑️");
+  });
+}
+
+// Close modals on outside click
+window.addEventListener("click", function(e){
+  if(e.target.classList.contains("modal")){
+    e.target.classList.remove("show");
+  }
+});
+</script>
+</body>
+</html>
