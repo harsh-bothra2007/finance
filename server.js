@@ -22,11 +22,31 @@ app.use(express.static("frontend"));
 
 app.get("/ping", (req, res) => res.send("Server is running!"));
 
+// ---------- GLOBAL ERROR HANDLING ----------
+process.on("uncaughtException", (err) => {
+  console.error("FATAL ERROR (uncaughtException):", err.stack || err);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("UNHANDLED REJECTION:", reason);
+});
+
 // ---------- DATABASE ----------
-const db = new Database("finance.db");
+let db;
+try {
+  console.log("Connecting to database: finance.db...");
+  db = new Database("finance.db");
+  console.log("Database connected successfully.");
+} catch (err) {
+  console.error("FAILED TO CONNECT TO DATABASE:", err);
+  console.log("\nTIP: If you are seeing a 'module not found' or 'native' error, run:");
+  console.log("rm -rf node_modules package-lock.json && npm install\n");
+  process.exit(1);
+}
 
 // USERS TABLE
-db.prepare(`
+try {
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE,
