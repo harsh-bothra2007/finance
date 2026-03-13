@@ -54,3 +54,18 @@ A comprehensive finance management application to track expenses, income, stocks
 - **Backend**: Express.js, better-sqlite3
 - **Frontend**: Vanilla HTML/CSS/JS
 - **Containerization**: Docker
+
+## Troubleshooting
+
+### "Server Error" or Native Module Issues
+If you see errors related to `better-sqlite3` or generic server crashes on a new machine:
+1.  **Clear existing modules**:
+    ```bash
+    rm -rf node_modules package-lock.json
+    ```
+2.  **Reinstall everything**:
+    ```bash
+    npm install
+    ```
+3.  **Check Environment Variables**:
+    Ensure `.env` exists and contains a `JWT_SECRET`.
