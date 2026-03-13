@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Database = require("better-sqlite3");
 const cors = require("cors");
+require("dotenv").config();
 const app = express();
 const PORT = 3000;
 
