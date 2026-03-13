@@ -53,5 +53,4 @@ A comprehensive finance management application to track expenses, income, stocks
 
 - **Backend**: Express.js, better-sqlite3
 - **Frontend**: Vanilla HTML/CSS/JS
-- **AI**: OpenAI GPT-4o-mini
 - **Containerization**: Docker
