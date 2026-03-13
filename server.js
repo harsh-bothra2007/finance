@@ -7,6 +7,14 @@ require("dotenv").config();
 const app = express();
 const PORT = 3000;
 
+if (!process.env.JWT_SECRET) {
+  console.error("CRITICAL ERROR: JWT_SECRET is not defined in your .env file!");
+  console.log("Please create a .env file and add: JWT_SECRET=your_secret_here");
+  process.exit(1);
+}
+
+console.log("Starting server...");
+
 // ---------- MIDDLEWARE ----------
 app.use(cors());
 app.use(express.json());
