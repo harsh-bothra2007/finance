@@ -3,35 +3,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Database = require("better-sqlite3");
 const cors = require("cors");
-const OpenAI = require("openai");
-require("dotenv").config();
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-async function aiCategorize(text) {
-
-  const prompt = `
-  Classify this expense into one single-word category.
-  Possible categories:
-  Food, Transport, Shopping, Entertainment, Health, Education, Bills, Other.
-
-  Expense description:
-  "${text}"
-
-  Respond with ONLY the category name.
-  `;
-
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0
-  });
-
-  return response.choices[0].message.content.trim();
-}
-
 const app = express();
 const PORT = 3000;
 
@@ -204,11 +175,7 @@ app.post("/expenses", auth, async (req, res) => {
   if (!req.body.date)
     return res.status(400).json({ error: "Date required" });
 
-  let category = req.body.category;
-
-  if (!category || category.trim() === "") {
-    category = await aiCategorize(req.body.remark);
-  }
+  let category = req.body.category || "Other";
 
   db.prepare(`
     INSERT INTO expenses(user_id, amount, remark, category, date)
@@ -376,7 +343,7 @@ app.get("/summary", auth, (req, res) => {
 
 });
 
-app.get("/ai-insights", authenticateToken, (req, res) => {
+app.get("/insights", authenticateToken, (req, res) => {
 
   const userId = req.user.userId;
 

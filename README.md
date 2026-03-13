@@ -5,7 +5,6 @@ A comprehensive finance management application to track expenses, income, stocks
 ## Features
 
 - **Expense & Income Tracking**: Manage your daily finances with ease.
-- **AI Categorization**: Automatically categorize expenses using AI.
 - **Stock Portfolio**: Track your investments and portfolio growth.
 - **Splitwise Integration**: Split bills with friends and track settlements.
 - **Gamification**: Earn streaks and badges for consistent tracking.
