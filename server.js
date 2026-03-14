@@ -247,6 +247,7 @@ app.get("/expenses", auth, (req, res) => {
 
   query += ` ORDER BY date DESC, created_at DESC`;
 
+  const rows = db.prepare(query).all(...params);
   res.json(rows);
 });
 
