@@ -651,7 +651,7 @@ body.dark #toast {
           <div class="filter">
             <input id="amount" type="number" placeholder="Amount (₹)">
             <input id="date" type="date">
-            <input id="category" placeholder="Category" list="categoryList">
+            <input id="category" placeholder="Category" list="categoryList" oninput="loadSuggestions(this.value)">
             <datalist id="categoryList"></datalist>
             <input id="remark" placeholder="Remark" list="remarkList">
             <datalist id="remarkList"></datalist>
@@ -1002,19 +1002,24 @@ document.addEventListener("DOMContentLoaded", function () {
   loadSuggestions();
 });
 
-async function loadSuggestions() {
+async function loadSuggestions(category = "") {
   try {
-    const [categories, remarks] = await Promise.all([
-      fetch(API + "/categories", { headers: { Authorization: "Bearer " + TOKEN } }).then(r => r.json()),
-      fetch(API + "/remarks", { headers: { Authorization: "Bearer " + TOKEN } }).then(r => r.json())
-    ]);
-
-    const catList = document.getElementById("categoryList");
-    const remList = document.getElementById("remarkList");
-
-    if (catList) {
-      catList.innerHTML = categories.map(c => `<option value="${c}">`).join("");
+    const headers = { Authorization: "Bearer " + TOKEN };
+    
+    // Fetch categories only on initial load if no category provided
+    if (!category) {
+      const categories = await fetch(API + "/categories", { headers }).then(r => r.json());
+      const catList = document.getElementById("categoryList");
+      if (catList) {
+        catList.innerHTML = categories.map(c => `<option value="${c}">`).join("");
+      }
     }
+
+    // Always fetch remarks, optionally filtered by category
+    const remarkUrl = API + "/remarks" + (category ? `?category=${encodeURIComponent(category)}` : "");
+    const remarks = await fetch(remarkUrl, { headers }).then(r => r.json());
+    
+    const remList = document.getElementById("remarkList");
     if (remList) {
       remList.innerHTML = remarks.map(r => `<option value="${r}">`).join("");
     }

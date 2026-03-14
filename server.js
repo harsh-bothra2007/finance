@@ -256,9 +256,18 @@ app.get("/categories", auth, (req, res) => {
 
 // ---------- GET UNIQUE REMARKS ----------
 app.get("/remarks", auth, (req, res) => {
-  const rows = db.prepare(`
-    SELECT DISTINCT remark FROM expenses WHERE user_id=? AND remark != '' ORDER BY remark ASC
-  `).all(req.user.userId);
+  const category = req.query.category;
+  let query = "SELECT DISTINCT remark FROM expenses WHERE user_id=? AND remark != ''";
+  let params = [req.user.userId];
+
+  if (category) {
+    query += " AND category=?";
+    params.push(category.toLowerCase());
+  }
+
+  query += " ORDER BY remark ASC";
+  
+  const rows = db.prepare(query).all(...params);
   res.json(rows.map(r => r.remark));
 });
 
