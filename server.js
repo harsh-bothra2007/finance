@@ -261,7 +261,7 @@ app.get("/remarks", auth, (req, res) => {
   let params = [req.user.userId];
 
   if (category) {
-    query += " AND category=?";
+    query += " AND LOWER(category)=?";
     params.push(category.toLowerCase());
   }
 

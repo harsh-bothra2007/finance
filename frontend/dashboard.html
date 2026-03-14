@@ -1016,13 +1016,20 @@ async function loadSuggestions(category = "") {
     }
 
     // Always fetch remarks, optionally filtered by category
-    const remarkUrl = API + "/remarks" + (category ? `?category=${encodeURIComponent(category)}` : "");
+    const remList = document.getElementById("remarkList");
+    if (!remList) return;
+
+    if (!category) {
+      // If no category is selected, clear or show nothing? 
+      // User said "dont show all the options", so let's clear it until a category is picked.
+      remList.innerHTML = "";
+      return;
+    }
+
+    const remarkUrl = API + "/remarks?category=" + encodeURIComponent(category);
     const remarks = await fetch(remarkUrl, { headers }).then(r => r.json());
     
-    const remList = document.getElementById("remarkList");
-    if (remList) {
-      remList.innerHTML = remarks.map(r => `<option value="${r}">`).join("");
-    }
+    remList.innerHTML = remarks.map(r => `<option value="${r}">`).join("");
   } catch (e) {
     console.error("Failed to load suggestions", e);
   }
