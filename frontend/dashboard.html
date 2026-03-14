@@ -799,6 +799,7 @@ function addExpense(){
     calendar.refetchEvents();
     loadSummary();
     showToast("Expense Added 💰");
+    loadSuggestions(); // Refresh suggestions
   });
 }
 
@@ -998,7 +999,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   calendar.render();
   loadSummary();
+  loadSuggestions();
 });
+
+async function loadSuggestions() {
+  try {
+    const [categories, remarks] = await Promise.all([
+      fetch(API + "/categories", { headers: { Authorization: "Bearer " + TOKEN } }).then(r => r.json()),
+      fetch(API + "/remarks", { headers: { Authorization: "Bearer " + TOKEN } }).then(r => r.json())
+    ]);
+
+    const catList = document.getElementById("categoryList");
+    const remList = document.getElementById("remarkList");
+
+    if (catList) {
+      catList.innerHTML = categories.map(c => `<option value="${c}">`).join("");
+    }
+    if (remList) {
+      remList.innerHTML = remarks.map(r => `<option value="${r}">`).join("");
+    }
+  } catch (e) {
+    console.error("Failed to load suggestions", e);
+  }
+}
 
 /* ============================
    MODAL LOGIC

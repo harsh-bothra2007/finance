@@ -247,9 +247,23 @@ app.get("/expenses", auth, (req, res) => {
 
   query += ` ORDER BY date DESC, created_at DESC`;
 
-  const rows = db.prepare(query).all(...params);
-
   res.json(rows);
+});
+
+// ---------- GET UNIQUE CATEGORIES ----------
+app.get("/categories", auth, (req, res) => {
+  const rows = db.prepare(`
+    SELECT DISTINCT category FROM expenses WHERE user_id=? ORDER BY category ASC
+  `).all(req.user.userId);
+  res.json(rows.map(r => r.category));
+});
+
+// ---------- GET UNIQUE REMARKS ----------
+app.get("/remarks", auth, (req, res) => {
+  const rows = db.prepare(`
+    SELECT DISTINCT remark FROM expenses WHERE user_id=? AND remark != '' ORDER BY remark ASC
+  `).all(req.user.userId);
+  res.json(rows.map(r => r.remark));
 });
 
 // ---------- UPDATE EXPENSE ----------
